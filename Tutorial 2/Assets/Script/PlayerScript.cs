@@ -11,13 +11,19 @@ public class PlayerScript : MonoBehaviour
     public TextMeshProUGUI score;
     private int scoreValue = 0;
     public GameObject win;
-
+    private float lives;
+    public TextMeshProUGUI livesText;
+    public GameObject loseGame;
+    public GameObject Player;
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
         score.text = scoreValue.ToString();
         win.SetActive(false);
+        lives = 3;
+        SetLivesText();
+        loseGame.SetActive(false);
     }
 
    
@@ -26,6 +32,8 @@ public class PlayerScript : MonoBehaviour
     {
         if(scoreValue == 4)
         {win.SetActive(true);}
+
+    
     }
 
 
@@ -37,15 +45,40 @@ public class PlayerScript : MonoBehaviour
         rd2d.AddForce(new Vector2(hozMovement * speed, vertMovement * speed));
     }
 
+
+    public void LoseGame()
+    {
+        loseGame.SetActive(true);
+
+        Destroy(Player);
+    }
     private void OnCollisionEnter2D(Collision2D collision)
-{
-    if(collision.collider.tag == "Coin")
+    {
+
+    if(collision.gameObject.CompareTag("Coin"))
     {
         scoreValue += 1;
         score.text = scoreValue.ToString();
         Destroy(collision.collider.gameObject);
+        collision.gameObject.SetActive(false);
     }
-}
+    else if (collision.gameObject.CompareTag("Enemy"))
+    {
+       collision.gameObject.SetActive(false);
+        lives = lives - 1;
+        SetLivesText();
+    }
+    if (lives <= 0)
+    {
+        LoseGame();
+    }
+
+    }
+
+    void SetLivesText()
+    {
+        livesText.text = "Lives: " + lives.ToString();
+    }
 
    private void OnCollisionStay2D(Collision2D collision)
     {
@@ -57,5 +90,6 @@ public class PlayerScript : MonoBehaviour
             }
         }
     }
+
 
 }
